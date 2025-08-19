@@ -8,13 +8,30 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Search, FileText, ArrowRight, Info } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Search, FileText, ArrowRight, Info, ArrowLeft, Plus, X, User, Scale, BookOpen, TrendingUp, TrendingDown, Clock } from "lucide-react";
 
 const NewApplication = () => {
   const { caseId } = useParams();
+  const [currentStep, setCurrentStep] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  
+  // Step 2 form data
+  const [recipientType, setRecipientType] = useState("");
+  const [courtName, setCourtName] = useState("");
+  const [customCourt, setCustomCourt] = useState("");
+  const [bench, setBench] = useState("");
+  const [district, setDistrict] = useState("");
+  const [subject, setSubject] = useState("");
+  const [ccRecipients, setCcRecipients] = useState<string[]>([]);
+  const [newCcRecipient, setNewCcRecipient] = useState("");
+  
+  // Step 3 form data
+  const [autoFillFromCase, setAutoFillFromCase] = useState(true);
 
   // Mock templates data
   const applicationTemplates = [
@@ -93,6 +110,47 @@ const NewApplication = () => {
   ];
 
   const categories = ["all", "সাধারণ", "প্রাথমিক", "নথিপত্র", "ফৌজদারি", "প্রতিরক্ষা", "বিশেষ"];
+  
+  // Mock case data for Step 3
+  const caseData = {
+    client: {
+      name: "মোহাম্মদ রহিম",
+      phone: "০১৭১২৩৪৫৬৭৮",
+      address: "১২৩ মতিঝিল, ঢাকা-১০০০",
+      nid: "১২৩৪৫৬৭৮৯০"
+    },
+    summary: "একটি জটিল দেওয়ানি মামলা যেখানে সম্পত্তির মালিকানা নিয়ে বিরোধ রয়েছে।",
+    story: "বাদী দাবি করেছেন যে বিবাদী অবৈধভাবে তার জমি দখল করে রেখেছে। ১৯৮৫ সালে বাদী উক্ত জমি ক্রয় করেন এবং নিয়মিত খাজনা প্রদান করে আসছেন।",
+    legalReferences: "সম্পত্তি আইন ১৯৫০, দেওয়ানি কার্যবিধি ১৯০৮, রেজিস্ট্রেশন আইন ১৯০৮",
+    positiveAspects: ["স্পষ্ট দলিল রয়েছে", "নিয়মিত খাজনা প্রদানের প্রমাণ", "দীর্ঘদিন দখলে"],
+    negativeAspects: ["বিবাদী পক্ষের পাল্টা দাবি", "কিছু নথি অস্পষ্ট"],
+    updates: [
+      {
+        id: "1",
+        date: "২৫ জানুয়ারি ২০২৪",
+        title: "শুনানির তারিখ পরিবর্তন",
+        description: "আদালত শুনানির তারিখ পরিবর্তন করেছেন",
+        tag: "শুনানি"
+      },
+      {
+        id: "2",
+        date: "২২ জানুয়ারি ২০২৪", 
+        title: "নতুন সাক্ষী তথ্য",
+        description: "বিবাদী পক্ষ নতুন সাক্ষী উপস্থাপন করেছে",
+        tag: "সাক্ষী"
+      }
+    ]
+  };
+
+  const courtOptions = [
+    "সুপ্রিম কোর্ট",
+    "হাইকোর্ট",
+    "জজ আদালত",
+    "মেট্রো ম্যাজিস্ট্রেট আদালত",
+    "জুডিশিয়াল ম্যাজিস্ট্রেট আদালত",
+    "ট্রাইব্যুনাল",
+    "থানা"
+  ];
 
   const filteredTemplates = applicationTemplates.filter(template => {
     const matchesSearch = searchTerm === "" || 
@@ -117,6 +175,34 @@ const NewApplication = () => {
     }
   };
 
+  const addCcRecipient = () => {
+    if (newCcRecipient.trim() && !ccRecipients.includes(newCcRecipient.trim())) {
+      setCcRecipients([...ccRecipients, newCcRecipient.trim()]);
+      setNewCcRecipient("");
+    }
+  };
+
+  const removeCcRecipient = (recipient: string) => {
+    setCcRecipients(ccRecipients.filter(r => r !== recipient));
+  };
+
+  const insertCaseData = (section: string, data: string) => {
+    // This would insert data into the document editor
+    console.log(`Inserting ${section}:`, data);
+  };
+
+  const nextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -130,9 +216,39 @@ const NewApplication = () => {
               <div>
                 <h1 className="text-2xl font-bold">নতুন আবেদন তৈরি করুন</h1>
                 <p className="text-muted-foreground">
-                  স্টেপ ১: আবেদনের ধরণ নির্বাচন করুন (কেস: {caseId})
+                  স্টেপ {currentStep}: {
+                    currentStep === 1 ? "আবেদনের ধরণ নির্বাচন করুন" :
+                    currentStep === 2 ? "যার উদ্দেশে আবেদন" :
+                    "কেস থেকে তথ্য লোড করুন"
+                  } (কেস: {caseId})
                 </p>
               </div>
+              <div className="flex gap-2">
+                {currentStep > 1 && (
+                  <Button variant="outline" onClick={prevStep}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    পূর্ববর্তী
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Step Progress */}
+            <div className="flex items-center space-x-4">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className="flex items-center">
+                  <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
+                    step <= currentStep ? 'bg-primary text-primary-foreground border-primary' : 'border-muted-foreground text-muted-foreground'
+                  }`}>
+                    {step}
+                  </div>
+                  {step < 3 && (
+                    <div className={`w-16 h-0.5 mx-2 ${
+                      step < currentStep ? 'bg-primary' : 'bg-muted-foreground'
+                    }`} />
+                  )}
+                </div>
+              ))}
             </div>
 
             {/* Legal Disclaimer */}
@@ -146,127 +262,438 @@ const NewApplication = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
-              {/* Templates Selection */}
+              {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 
-                {/* Search and Filter */}
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <Input
-                          placeholder="আবেদনের ধরণ খুঁজুন..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full"
-                        />
-                      </div>
-                      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                        <SelectTrigger className="w-48">
-                          <SelectValue placeholder="ক্যাটাগরি" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">সব ক্যাটাগরি</SelectItem>
-                          {categories.slice(1).map(cat => (
-                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Templates Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredTemplates.map((template) => (
-                    <Card 
-                      key={template.id}
-                      className={`cursor-pointer transition-all hover:shadow-md ${
-                        selectedTemplate === template.id ? 'ring-2 ring-primary' : ''
-                      }`}
-                      onClick={() => setSelectedTemplate(template.id)}
-                    >
-                      <CardHeader className="pb-3">
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-lg">{template.title}</CardTitle>
-                          <div className="flex gap-1">
-                            <Badge variant="outline" className="text-xs">
-                              {template.category}
-                            </Badge>
-                            <Badge variant={getUsageBadgeVariant(template.usage)} className="text-xs">
-                              {template.usage}
-                            </Badge>
+                {/* Step 1: Template Selection */}
+                {currentStep === 1 && (
+                  <>
+                    {/* Search and Filter */}
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex gap-4">
+                          <div className="flex-1">
+                            <Input
+                              placeholder="আবেদনের ধরণ খুঁজুন..."
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              className="w-full"
+                            />
                           </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {template.description}
-                        </p>
-                        <div className="flex flex-wrap gap-1">
-                          {template.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
+                          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                            <SelectTrigger className="w-48">
+                              <SelectValue placeholder="ক্যাটাগরি" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">সব ক্যাটাগরি</SelectItem>
+                              {categories.slice(1).map(cat => (
+                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
 
-                {filteredTemplates.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>কোনো টেমপ্লেট পাওয়া যায়নি</p>
+                    {/* Templates Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {filteredTemplates.map((template) => (
+                        <Card 
+                          key={template.id}
+                          className={`cursor-pointer transition-all hover:shadow-md ${
+                            selectedTemplate === template.id ? 'ring-2 ring-primary' : ''
+                          }`}
+                          onClick={() => setSelectedTemplate(template.id)}
+                        >
+                          <CardHeader className="pb-3">
+                            <div className="flex justify-between items-start">
+                              <CardTitle className="text-lg">{template.title}</CardTitle>
+                              <div className="flex gap-1">
+                                <Badge variant="outline" className="text-xs">
+                                  {template.category}
+                                </Badge>
+                                <Badge variant={getUsageBadgeVariant(template.usage)} className="text-xs">
+                                  {template.usage}
+                                </Badge>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {template.description}
+                            </p>
+                            <div className="flex flex-wrap gap-1">
+                              {template.tags.map((tag) => (
+                                <Badge key={tag} variant="secondary" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+
+                    {filteredTemplates.length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>কোনো টেমপ্লেট পাওয়া যায়নি</p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Step 2: Recipient & Court */}
+                {currentStep === 2 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>যার উদ্দেশে আবেদন</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Recipient Type */}
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">রিসিপিয়েন্ট টাইপ *</label>
+                        <Select value={recipientType} onValueChange={setRecipientType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="নির্বাচন করুন" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="judge">বিচারক</SelectItem>
+                            <SelectItem value="magistrate">ম্যাজিস্ট্রেট</SelectItem>
+                            <SelectItem value="tribunal">ট্রাইব্যুনাল</SelectItem>
+                            <SelectItem value="oc">ওসি</SelectItem>
+                            <SelectItem value="registry">রেজিস্ট্রি</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Court Name */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">কোর্টের নাম *</label>
+                          <Select value={courtName} onValueChange={setCourtName}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="নির্বাচন করুন" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {courtOptions.map(court => (
+                                <SelectItem key={court} value={court}>{court}</SelectItem>
+                              ))}
+                              <SelectItem value="custom">অন্যান্য</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {courtName === "custom" && (
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">কাস্টম কোর্ট নাম</label>
+                            <Input
+                              value={customCourt}
+                              onChange={(e) => setCustomCourt(e.target.value)}
+                              placeholder="কোর্টের নাম লিখুন"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Bench and District */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">বেঞ্চ/শাখা</label>
+                          <Input
+                            value={bench}
+                            onChange={(e) => setBench(e.target.value)}
+                            placeholder="বেঞ্চ বা শাখার নাম"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">জেলা/সার্কেল</label>
+                          <Input
+                            value={district}
+                            onChange={(e) => setDistrict(e.target.value)}
+                            placeholder="জেলা বা সার্কেলের নাম"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Subject */}
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">বিষয়/Subject *</label>
+                        <Input
+                          value={subject}
+                          onChange={(e) => setSubject(e.target.value)}
+                          placeholder="আবেদনের বিষয় এক লাইনে লিখুন"
+                        />
+                      </div>
+
+                      {/* CC Recipients */}
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">কপি প্রেরণ (CC)</label>
+                        <div className="space-y-3">
+                          <div className="flex gap-2">
+                            <Input
+                              value={newCcRecipient}
+                              onChange={(e) => setNewCcRecipient(e.target.value)}
+                              placeholder="রিসিপিয়েন্ট যোগ করুন"
+                              onKeyPress={(e) => e.key === 'Enter' && addCcRecipient()}
+                            />
+                            <Button type="button" onClick={addCcRecipient}>
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          
+                          {ccRecipients.length > 0 && (
+                            <div className="space-y-2">
+                              {ccRecipients.map((recipient, index) => (
+                                <div key={index} className="flex items-center justify-between bg-muted p-2 rounded">
+                                  <span className="text-sm">{recipient}</span>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => removeCcRecipient(recipient)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <Button onClick={nextStep} disabled={!recipientType || !courtName || !subject}>
+                          <ArrowRight className="h-4 w-4 mr-2" />
+                          পরবর্তী ধাপ
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Step 3: Case Loader */}
+                {currentStep === 3 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Case Loader Panel */}
+                    <div className="lg:col-span-1">
+                      <Card className="sticky top-6">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Scale className="h-5 w-5" />
+                            কেস লোডার
+                          </CardTitle>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="auto-fill"
+                              checked={autoFillFromCase}
+                              onCheckedChange={(checked) => setAutoFillFromCase(checked === true)}
+                            />
+                            <label htmlFor="auto-fill" className="text-sm">
+                              কেস থেকে অটো-ফিল করুন
+                            </label>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {/* Client Info */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-sm flex items-center gap-1">
+                                <User className="h-4 w-4" />
+                                ক্লায়েন্ট তথ্য
+                              </h4>
+                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('client', JSON.stringify(caseData.client))}>
+                                ইনসার্ট
+                              </Button>
+                            </div>
+                            <div className="text-xs space-y-1 text-muted-foreground">
+                              <div>নাম: {caseData.client.name}</div>
+                              <div>ফোন: {caseData.client.phone}</div>
+                              <div>ঠিকানা: {caseData.client.address}</div>
+                            </div>
+                          </div>
+
+                          <Separator />
+
+                          {/* Case Summary */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-sm">কেস সারসংক্ষেপ</h4>
+                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('summary', caseData.summary)}>
+                                ইনসার্ট
+                              </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{caseData.summary}</p>
+                          </div>
+
+                          <Separator />
+
+                          {/* Case Story */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-sm">কেস স্টোরি</h4>
+                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('story', caseData.story)}>
+                                ইনসার্ট
+                              </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{caseData.story}</p>
+                          </div>
+
+                          <Separator />
+
+                          {/* Legal References */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-sm flex items-center gap-1">
+                                <BookOpen className="h-4 w-4" />
+                                আইনি রেফারেন্স
+                              </h4>
+                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('legal', caseData.legalReferences)}>
+                                ইনসার্ট
+                              </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{caseData.legalReferences}</p>
+                          </div>
+
+                          <Separator />
+
+                          {/* Positive/Negative Aspects */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-sm flex items-center gap-1">
+                                <TrendingUp className="h-4 w-4 text-green-500" />
+                                পজিটিভ দিক
+                              </h4>
+                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('positive', caseData.positiveAspects.join(', '))}>
+                                ইনসার্ট
+                              </Button>
+                            </div>
+                            <ul className="text-xs text-muted-foreground space-y-1">
+                              {caseData.positiveAspects.map((aspect, i) => (
+                                <li key={i}>• {aspect}</li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-sm flex items-center gap-1">
+                                <TrendingDown className="h-4 w-4 text-red-500" />
+                                নেগেটিভ দিক
+                              </h4>
+                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('negative', caseData.negativeAspects.join(', '))}>
+                                ইনসার্ট
+                              </Button>
+                            </div>
+                            <ul className="text-xs text-muted-foreground space-y-1">
+                              {caseData.negativeAspects.map((aspect, i) => (
+                                <li key={i}>• {aspect}</li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <Separator />
+
+                          {/* Timeline Updates */}
+                          <div>
+                            <h4 className="font-medium text-sm flex items-center gap-1 mb-2">
+                              <Clock className="h-4 w-4" />
+                              টাইমলাইন আপডেটস
+                            </h4>
+                            <div className="space-y-2">
+                              {caseData.updates.map((update) => (
+                                <div key={update.id} className="border rounded p-2">
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                      <div className="text-xs font-medium">{update.title}</div>
+                                      <div className="text-xs text-muted-foreground mt-1">{update.description}</div>
+                                      <div className="text-xs text-muted-foreground">{update.date}</div>
+                                    </div>
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      className="text-xs h-6"
+                                      onClick={() => insertCaseData('update', `${update.title}: ${update.description}`)}
+                                    >
+                                      ইনসার্ট
+                                    </Button>
+                                  </div>
+                                  <Badge variant="outline" className="mt-2 text-xs">
+                                    {update.tag}
+                                  </Badge>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Document Editor Preview */}
+                    <div className="lg:col-span-2">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>ডকুমেন্ট এডিটর</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="min-h-96 border rounded p-4 bg-muted/20">
+                            <p className="text-muted-foreground text-center">
+                              এখানে আবেদনের কনটেন্ট এডিট করা হবে।<br />
+                              বাম পাশের কেস লোডার থেকে ইনসার্ট বোতামে ক্লিক করে তথ্য যোগ করুন।
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Template Preview */}
-              <div className="lg:col-span-1">
-                <Card className="sticky top-6">
-                  <CardHeader>
-                    <CardTitle>টেমপ্লেট প্রিভিউ</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {selectedTemplateData ? (
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="font-medium mb-2">{selectedTemplateData.title}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {selectedTemplateData.description}
-                          </p>
-                        </div>
+              {/* Right Sidebar - Template Preview (Step 1 only) */}
+              {currentStep === 1 && (
+                <div className="lg:col-span-1">
+                  <Card className="sticky top-6">
+                    <CardHeader>
+                      <CardTitle>টেমপ্লেট প্রিভিউ</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {selectedTemplateData ? (
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="font-medium mb-2">{selectedTemplateData.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {selectedTemplateData.description}
+                            </p>
+                          </div>
 
-                        <div>
-                          <h4 className="font-medium text-sm mb-2">প্রয়োজনীয় ফিল্ডসমূহ:</h4>
-                          <ul className="space-y-1">
-                            {selectedTemplateData.requiredFields.map((field, index) => (
-                              <li key={index} className="text-sm text-muted-foreground flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0" />
-                                {field}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                          <div>
+                            <h4 className="font-medium text-sm mb-2">প্রয়োজনীয় ফিল্ডসমূহ:</h4>
+                            <ul className="space-y-1">
+                              {selectedTemplateData.requiredFields.map((field, index) => (
+                                <li key={index} className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0" />
+                                  {field}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
 
-                        <div className="pt-4">
-                          <Button className="w-full" disabled={!selectedTemplate}>
-                            <ArrowRight className="h-4 w-4 mr-2" />
-                            পরবর্তী ধাপে যান
-                          </Button>
+                          <div className="pt-4">
+                            <Button className="w-full" disabled={!selectedTemplate} onClick={nextStep}>
+                              <ArrowRight className="h-4 w-4 mr-2" />
+                              পরবর্তী ধাপে যান
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p className="text-sm">একটি টেমপ্লেট নির্বাচন করুন</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p className="text-sm">একটি টেমপ্লেট নির্বাচন করুন</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           </div>
         </main>
