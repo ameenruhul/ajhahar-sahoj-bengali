@@ -1,25 +1,23 @@
 import { useState } from "react";
-import { Header } from "@/components/layout/Header";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { 
   Download, 
-  Share2,
+  Printer,
   FileText, 
   Calendar,
   User,
   Scale,
-  CheckCircle,
-  ArrowLeft
+  ArrowLeft,
+  Clock,
+  UserCheck
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const AjhaharDocument = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const { docId } = useParams();
   const { toast } = useToast();
@@ -40,21 +38,18 @@ const AjhaharDocument = () => {
     window.print();
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'আজহার ডকুমেন্ট',
-        text: 'আইনি আজহার ডকুমেন্ট',
-        url: window.location.href
-      });
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "লিংক কপি হয়েছে",
-        description: "আজহার ডকুমেন্টের লিংক ক্লিপবোর্ডে কপি হয়েছে"
-      });
-    }
+  const handleBackToOverview = () => {
+    // Extract case ID from document ID (assuming format: ajhahar-{timestamp} or similar)
+    const caseId = "case-123"; // In real implementation, this would be derived from docId or stored data
+    navigate(`/case/final-overview/${caseId}`);
+  };
+
+  // Mock metadata
+  const documentMeta = {
+    createdDate: "১৫ ডিসেম্বর ২০২৪",
+    createdTime: "৩:৪৫ PM", 
+    generatedBy: "মো. করিম উদ্দিন (আইনজীবী)",
+    caseId: "CASE-2024-001"
   };
 
   const mockAjhaharData = {
@@ -81,50 +76,57 @@ const AjhaharDocument = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-      
-      <div className="flex">
-        <DashboardSidebar isOpen={isSidebarOpen} />
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Fixed Header with Actions */}
+      <div className="bg-card border-b px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" onClick={handleBackToOverview}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            ওভারভিউ এ ফিরুন
+          </Button>
+          <div className="h-6 w-px bg-border" />
+          <div>
+            <h1 className="text-lg font-semibold">আজহার ডকুমেন্ট</h1>
+            <p className="text-sm text-muted-foreground">ডকুমেন্ট আইডি: {docId}</p>
+          </div>
+        </div>
         
-        <main className="flex-1 min-h-[calc(100vh-64px)] overflow-auto">
-          <div className="max-w-4xl mx-auto p-6 space-y-6">
-            {/* Header with Actions */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-10 h-10 bg-success rounded-lg">
-                  <CheckCircle className="h-6 w-6 text-success-foreground" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold">আজহার ডকুমেন্ট প্রস্তুত</h1>
-                  <p className="text-muted-foreground">ডকুমেন্ট আইডি: {docId}</p>
-                </div>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button variant="outline" onClick={handleShare}>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  শেয়ার
-                </Button>
-                <Button variant="outline" onClick={handlePrint}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  প্রিন্ট
-                </Button>
-                <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90">
-                  <Download className="h-4 w-4 mr-2" />
-                  PDF ডাউনলোড
-                </Button>
-              </div>
+        <div className="flex space-x-2">
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="h-4 w-4 mr-2" />
+            প্রিন্ট
+          </Button>
+          <Button onClick={handleDownload}>
+            <Download className="h-4 w-4 mr-2" />
+            ডাউনলোড
+          </Button>
+        </div>
+      </div>
+
+      {/* Meta Information Bar */}
+      <div className="bg-muted/30 px-6 py-3 border-b">
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4" />
+              <span>তৈরি: {documentMeta.createdDate}, {documentMeta.createdTime}</span>
             </div>
+            <div className="flex items-center space-x-2">
+              <UserCheck className="h-4 w-4" />
+              <span>জেনারেটর: {documentMeta.generatedBy}</span>
+            </div>
+          </div>
+          <Badge variant="outline">
+            কেস: {documentMeta.caseId}
+          </Badge>
+        </div>
+      </div>
 
-            <Badge variant="default" className="bg-success">
-              <CheckCircle className="h-3 w-3 mr-1" />
-              আজহার সফলভাবে তৈরি হয়েছে
-            </Badge>
-
-            {/* Ajhahar Document Preview */}
-            <Card className="print-content">
-              <CardContent className="p-8 space-y-6">
+      {/* Full-page PDF Viewer */}
+      <div className="flex-1 overflow-auto bg-muted/20">
+        <div className="max-w-4xl mx-auto p-6">
+          <Card className="print-content shadow-lg">
+            <CardContent className="p-8 space-y-6">
                 {/* Header */}
                 <div className="text-center space-y-2 border-b pb-4">
                   <h2 className="text-xl font-bold">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</h2>
@@ -226,31 +228,9 @@ const AjhaharDocument = () => {
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Navigation */}
-            <div className="flex justify-between items-center pt-6 border-t">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/dashboard")}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                ড্যাশবোর্ডে ফিরুন
-              </Button>
-              
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/clients/new")}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  নতুন মামলা শুরু করুন
-                </Button>
-              </div>
-            </div>
-          </div>
-        </main>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
