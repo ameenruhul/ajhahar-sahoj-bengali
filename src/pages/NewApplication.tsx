@@ -1,24 +1,33 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
-import { Search, FileText, ArrowRight, Info, ArrowLeft, Plus, X, User, Scale, BookOpen, TrendingUp, TrendingDown, Clock } from "lucide-react";
+import React, { useState, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { Header } from '@/components/layout/Header';
+import CaseLoader from '@/components/forms/CaseLoader';
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
+import { Search, FileText, ArrowRight, Info, ArrowLeft, Plus, X, User, Scale, BookOpen, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const NewApplication = () => {
   const { caseId } = useParams();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  
+  // References for text insertion
+  const factsRef = useRef<HTMLTextAreaElement>(null);
+  const groundsRef = useRef<HTMLTextAreaElement>(null);
+  const prayerRef = useRef<HTMLTextAreaElement>(null);
+  const subjectRef = useRef<HTMLInputElement>(null);
   
   // Step 2 form data
   const [recipientType, setRecipientType] = useState("");
@@ -32,6 +41,72 @@ const NewApplication = () => {
   
   // Step 3 form data
   const [autoFillFromCase, setAutoFillFromCase] = useState(true);
+  
+  // Mock case data for the Case Loader
+  const caseLoaderData = {
+    id: caseId || '1',
+    caseNumber: 'GR Case No. 123/2025',
+    clientName: 'মোহাম্মদ করিম উদ্দিন',
+    clientPhone: '০১৭০০০০০০০০',
+    court: 'জুডিশিয়াল ম্যাজিস্ট্রেট আদালত, ঢাকা',
+    status: 'Active',
+    summary: 'এটি একটি অনুসন্ধান মামলার সংক্ষিপ্ত বিবরণ। ঘটনার মূল বিষয়বস্তু এবং প্রাথমিক তথ্যাদি।',
+    story: 'ঘটনার বিস্তারিত বিবরণ: তারিখ, সময়, স্থান এবং জড়িত ব্যক্তিদের সম্পূর্ণ তথ্য। সাক্ষী এবং প্রমাণাদির বিবরণ।',
+    references: 'দণ্ডবিধি ১৮৬০ এর ধারা ৩০২, ৩০৭। ফৌজদারি কার্যবিধি ১৮৯৮ এর ধারা ১৫৪। প্রাসঙ্গিক মামলার রায়।',
+    positiveAspects: 'শক্তিশালী সাক্ষ্য প্রমাণ রয়েছে। আইনি দিক থেকে অনুকূল অবস্থান। পূর্ববর্তী রায়ের সমর্থন।',
+    negativeAspects: 'কিছু সাক্ষীর বিশ্বসযোগ্যতা নিয়ে সন্দেহ। বিপক্ষের শক্তিশালী আইনি অবস্থান। সময়ের সীমাবদ্ধতা।',
+    updates: [
+      {
+        id: '1',
+        title: 'নতুন সাক্ষী পাওয়া গেছে',
+        content: 'ঘটনার প্রত্যক্ষদর্শী একজন নতুন সাক্ষী পাওয়া গেছে যিনি গুরুত্বপূর্ণ তথ্য প্রদান করতে পারেন।',
+        date: '২০২৫-০৮-১৫',
+        type: 'update' as const,
+        selected: false
+      },
+      {
+        id: '2',
+        title: 'ডকুমেন্ট ভেরিফিকেশন সমস্যা',
+        content: 'একটি গুরুত্বপূর্ণ ডকুমেন্টের সত্যতা যাচাই করা প্রয়োজন।',
+        date: '২০২৫-০৮-১৪',
+        type: 'issue' as const,
+        selected: false
+      },
+      {
+        id: '3',
+        title: 'আদালত তারিখ নির্ধারণ',
+        content: 'পরবর্তী শুনানির তারিখ ২৫ আগস্ট ২০২৫ নির্ধারণ করা হয়েছে।',
+        date: '২০২৫-০৮-১২',
+        type: 'update' as const,
+        selected: false
+      }
+    ],
+    documents: [
+      {
+        id: '1',
+        name: 'জাতীয় পরিচয়পত্র.pdf',
+        type: 'PDF',
+        date: '২০২৫-০৮-১০',
+        size: '২.৩ MB'
+      },
+      {
+        id: '2',
+        name: 'থানার রিপোর্ট.docx',
+        type: 'Word',
+        date: '২০২৫-০৮-০৮',
+        size: '১.৮ MB'
+      },
+      {
+        id: '3',
+        name: 'সাক্ষীর বিবৃতি.pdf',
+        type: 'PDF',
+        date: '২০২৫-০৮-০৫',
+        size: '৯৮৫ KB'
+      }
+    ]
+  };
+  
+  const [caseUpdates, setCaseUpdates] = useState(caseLoaderData.updates);
 
   // Mock templates data
   const applicationTemplates = [
@@ -186,9 +261,46 @@ const NewApplication = () => {
     setCcRecipients(ccRecipients.filter(r => r !== recipient));
   };
 
-  const insertCaseData = (section: string, data: string) => {
-    // This would insert data into the document editor
-    console.log(`Inserting ${section}:`, data);
+  // Case Loader handlers
+  const handleInsertText = (text: string, targetField?: string) => {
+    // Insert text at current cursor position or in specific field
+    if (targetField === 'subject' && subjectRef.current) {
+      const input = subjectRef.current;
+      const start = input.selectionStart || 0;
+      const end = input.selectionEnd || 0;
+      const currentValue = input.value;
+      const newValue = currentValue.substring(0, start) + text + currentValue.substring(end);
+      setSubject(newValue);
+      // Set cursor position after inserted text
+      setTimeout(() => {
+        input.focus();
+        input.setSelectionRange(start + text.length, start + text.length);
+      }, 0);
+    } else {
+      // For general insertion, we'll show a toast for now
+      toast({
+        title: "টেক্সট ইনসার্ট করা হয়েছে",
+        description: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+      });
+    }
+  };
+
+  const handleUpdateSelection = (updateId: string, selected: boolean) => {
+    setCaseUpdates(prev => 
+      prev.map(update => 
+        update.id === updateId ? { ...update, selected } : update
+      )
+    );
+  };
+
+  const handleAttachDocument = (documentId: string) => {
+    const document = caseLoaderData.documents.find(doc => doc.id === documentId);
+    if (document) {
+      toast({
+        title: "ডকুমেন্ট সংযুক্ত",
+        description: `"${document.name}" সংযুক্তি তালিকায় যোগ করা হয়েছে।`,
+      });
+    }
   };
 
   const nextStep = () => {
@@ -206,9 +318,20 @@ const NewApplication = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="flex">
+      <div className="flex h-screen">
         <DashboardSidebar />
-        <main className="flex-1 p-6">
+        
+        {/* Case Loader Panel - Always visible */}
+        {currentStep >= 2 && (
+          <CaseLoader 
+            caseData={{ ...caseLoaderData, updates: caseUpdates }}
+            onInsertText={handleInsertText}
+            onUpdateSelection={handleUpdateSelection}
+            onAttachDocument={handleAttachDocument}
+          />
+        )}
+        
+        <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto space-y-6">
             
             {/* Header */}
@@ -471,180 +594,84 @@ const NewApplication = () => {
                   </Card>
                 )}
 
-                {/* Step 3: Case Loader */}
+                {/* Step 3: Case Loader Content */}
                 {currentStep === 3 && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Case Loader Panel */}
-                    <div className="lg:col-span-1">
-                      <Card className="sticky top-6">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <Scale className="h-5 w-5" />
-                            কেস লোডার
-                          </CardTitle>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="auto-fill"
-                              checked={autoFillFromCase}
-                              onCheckedChange={(checked) => setAutoFillFromCase(checked === true)}
-                            />
-                            <label htmlFor="auto-fill" className="text-sm">
-                              কেস থেকে অটো-ফিল করুন
-                            </label>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>ডকুমেন্ট এডিটর</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        বাম পাশের কেস লোডার থেকে ইনসার্ট বোতামে ক্লিক করে তথ্য যোগ করুন।
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {/* Facts Section */}
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">ঘটনার সারমর্ম (Facts)</label>
+                          <Textarea
+                            ref={factsRef}
+                            placeholder="ঘটনার বিস্তারিত তথ্য এখানে লিখুন..."
+                            className="min-h-32"
+                          />
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="mt-2"
+                            onClick={() => handleInsertText(caseLoaderData.story, 'facts')}
+                          >
+                            কেস স্টোরি থেকে নিন
+                          </Button>
+                        </div>
+
+                        <Separator />
+
+                        {/* Grounds Section */}
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">গ্রাউন্ডস/কারণসমূহ</label>
+                          <Textarea
+                            ref={groundsRef}
+                            placeholder="আবেদনের কারণসমূহ এখানে যোগ করুন..."
+                            className="min-h-32"
+                          />
+                          <div className="mt-2 text-sm text-muted-foreground">
+                            • বুলেট পয়েন্ট যোগ করুন বা রি-অর্ডার করুন
+                            • নির্বাচিত আপডেট ও ইস্যু ট্যাগ এখানে যোগ হবে
                           </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {/* Client Info */}
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium text-sm flex items-center gap-1">
-                                <User className="h-4 w-4" />
-                                ক্লায়েন্ট তথ্য
-                              </h4>
-                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('client', JSON.stringify(caseData.client))}>
-                                ইনসার্ট
-                              </Button>
-                            </div>
-                            <div className="text-xs space-y-1 text-muted-foreground">
-                              <div>নাম: {caseData.client.name}</div>
-                              <div>ফোন: {caseData.client.phone}</div>
-                              <div>ঠিকানা: {caseData.client.address}</div>
-                            </div>
+                        </div>
+
+                        <Separator />
+
+                        {/* Prayer Section */}
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">প্রার্থিত উপশম (Reliefs Sought/Prayer)</label>
+                          <Textarea
+                            ref={prayerRef}
+                            placeholder="আপনার প্রার্থনা এখানে লিখুন..."
+                            className="min-h-24"
+                          />
+                          <div className="mt-2 flex gap-2">
+                            <Button variant="outline" size="sm">
+                              টেমপ্লেট সাজেশন
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              কাস্টম এডিট
+                            </Button>
                           </div>
+                        </div>
 
-                          <Separator />
-
-                          {/* Case Summary */}
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium text-sm">কেস সারসংক্ষেপ</h4>
-                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('summary', caseData.summary)}>
-                                ইনসার্ট
-                              </Button>
-                            </div>
-                            <p className="text-xs text-muted-foreground">{caseData.summary}</p>
-                          </div>
-
-                          <Separator />
-
-                          {/* Case Story */}
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium text-sm">কেস স্টোরি</h4>
-                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('story', caseData.story)}>
-                                ইনসার্ট
-                              </Button>
-                            </div>
-                            <p className="text-xs text-muted-foreground">{caseData.story}</p>
-                          </div>
-
-                          <Separator />
-
-                          {/* Legal References */}
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium text-sm flex items-center gap-1">
-                                <BookOpen className="h-4 w-4" />
-                                আইনি রেফারেন্স
-                              </h4>
-                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('legal', caseData.legalReferences)}>
-                                ইনসার্ট
-                              </Button>
-                            </div>
-                            <p className="text-xs text-muted-foreground">{caseData.legalReferences}</p>
-                          </div>
-
-                          <Separator />
-
-                          {/* Positive/Negative Aspects */}
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium text-sm flex items-center gap-1">
-                                <TrendingUp className="h-4 w-4 text-green-500" />
-                                পজিটিভ দিক
-                              </h4>
-                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('positive', caseData.positiveAspects.join(', '))}>
-                                ইনসার্ট
-                              </Button>
-                            </div>
-                            <ul className="text-xs text-muted-foreground space-y-1">
-                              {caseData.positiveAspects.map((aspect, i) => (
-                                <li key={i}>• {aspect}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium text-sm flex items-center gap-1">
-                                <TrendingDown className="h-4 w-4 text-red-500" />
-                                নেগেটিভ দিক
-                              </h4>
-                              <Button size="sm" variant="ghost" onClick={() => insertCaseData('negative', caseData.negativeAspects.join(', '))}>
-                                ইনসার্ট
-                              </Button>
-                            </div>
-                            <ul className="text-xs text-muted-foreground space-y-1">
-                              {caseData.negativeAspects.map((aspect, i) => (
-                                <li key={i}>• {aspect}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <Separator />
-
-                          {/* Timeline Updates */}
-                          <div>
-                            <h4 className="font-medium text-sm flex items-center gap-1 mb-2">
-                              <Clock className="h-4 w-4" />
-                              টাইমলাইন আপডেটস
-                            </h4>
-                            <div className="space-y-2">
-                              {caseData.updates.map((update) => (
-                                <div key={update.id} className="border rounded p-2">
-                                  <div className="flex items-start justify-between">
-                                    <div className="flex-1">
-                                      <div className="text-xs font-medium">{update.title}</div>
-                                      <div className="text-xs text-muted-foreground mt-1">{update.description}</div>
-                                      <div className="text-xs text-muted-foreground">{update.date}</div>
-                                    </div>
-                                    <Button 
-                                      size="sm" 
-                                      variant="ghost" 
-                                      className="text-xs h-6"
-                                      onClick={() => insertCaseData('update', `${update.title}: ${update.description}`)}
-                                    >
-                                      ইনসার্ট
-                                    </Button>
-                                  </div>
-                                  <Badge variant="outline" className="mt-2 text-xs">
-                                    {update.tag}
-                                  </Badge>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    {/* Document Editor Preview */}
-                    <div className="lg:col-span-2">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>ডকুমেন্ট এডিটর</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="min-h-96 border rounded p-4 bg-muted/20">
-                            <p className="text-muted-foreground text-center">
-                              এখানে আবেদনের কনটেন্ট এডিট করা হবে।<br />
-                              বাম পাশের কেস লোডার থেকে ইনসার্ট বোতামে ক্লিক করে তথ্য যোগ করুন।
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
+                        <div className="flex justify-between pt-4">
+                          <Button variant="outline" onClick={prevStep}>
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            পূর্ববর্তী
+                          </Button>
+                          <Button>
+                            <ArrowRight className="h-4 w-4 mr-2" />
+                            পরবর্তী ধাপ
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
 
