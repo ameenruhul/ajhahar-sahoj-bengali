@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-import { CaseStoryForm } from "@/components/forms/CaseStoryForm";
-import { GuidedQASession } from "@/components/qa/GuidedQASession";
+import { CaseSummaryForm } from "@/components/forms/CaseSummaryForm";
+import { QuestionsManager } from "@/components/forms/QuestionsManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,11 +13,26 @@ import { useToast } from "@/hooks/use-toast";
 const CaseSummaryQuestions = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentSection, setCurrentSection] = useState<"summary" | "questions">("summary");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   const { toast } = useToast();
 
+  // Prevent navigation with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'আপনার পরিবর্তনগুলি সংরক্ষিত হয়নি। আপনি কি নিশ্চিত যে আপনি পেজ ছেড়ে যেতে চান?';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   const handleSaveAndContinue = () => {
+    setHasUnsavedChanges(false);
     toast({
       title: "কেস তথ্য সংরক্ষিত",
       description: "আইনি পরামর্শের ধাপে এগিয়ে যাচ্ছেন..."
@@ -67,7 +82,7 @@ const CaseSummaryQuestions = () => {
                     className="flex items-center space-x-2"
                   >
                     <FileText className="h-4 w-4" />
-                    <span>মামলার বিবরণ</span>
+                    <span>কেস সারসংক্ষেপ</span>
                   </Button>
                   <Button
                     variant={currentSection === "questions" ? "default" : "outline"}
@@ -75,7 +90,7 @@ const CaseSummaryQuestions = () => {
                     className="flex items-center space-x-2"
                   >
                     <MessageSquare className="h-4 w-4" />
-                    <span>গাইডেড প্রশ্নোত্তর</span>
+                    <span>প্রশ্নোত্তর</span>
                   </Button>
                 </div>
               </CardContent>
@@ -83,9 +98,9 @@ const CaseSummaryQuestions = () => {
 
             {/* Content based on current section */}
             {currentSection === "summary" ? (
-              <CaseStoryForm />
+              <CaseSummaryForm caseId={id} />
             ) : (
-              <GuidedQASession />
+              <QuestionsManager caseId={id} />
             )}
             
             {/* Navigation */}
