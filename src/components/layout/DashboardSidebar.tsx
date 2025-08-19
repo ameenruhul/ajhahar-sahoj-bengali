@@ -30,6 +30,13 @@ const menuItems = [
     subtitle: "Add Client",
     icon: UserPlus,
     path: "/clients/new"
+  },
+  {
+    id: "applications",
+    title: "আবেদনসমূহ",
+    subtitle: "Applications",
+    icon: FileText,
+    path: "/applications"
   }
 ];
 
