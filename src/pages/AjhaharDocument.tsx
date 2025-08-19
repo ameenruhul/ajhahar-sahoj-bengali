@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { 
   Download, 
-  Printer, 
   Share2,
   FileText, 
   Calendar,
@@ -108,7 +107,7 @@ const AjhaharDocument = () => {
                   শেয়ার
                 </Button>
                 <Button variant="outline" onClick={handlePrint}>
-                  <Printer className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-2" />
                   প্রিন্ট
                 </Button>
                 <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90">
