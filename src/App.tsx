@@ -9,6 +9,9 @@ import CaseSummaryQuestions from "./pages/CaseSummaryQuestions";
 import CaseLawAdvice from "./pages/CaseLawAdvice";
 import CaseFinalOverview from "./pages/CaseFinalOverview";
 import AjhaharDocument from "./pages/AjhaharDocument";
+import Applications from "./pages/Applications";
+import CaseApplications from "./pages/CaseApplications";
+import NewApplication from "./pages/NewApplication";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +30,9 @@ const App = () => (
           <Route path="/case/law-advice/:id" element={<CaseLawAdvice />} />
           <Route path="/case/final-overview/:id" element={<CaseFinalOverview />} />
           <Route path="/documents/ajhahar/:docId" element={<AjhaharDocument />} />
+          <Route path="/applications" element={<Applications />} />
+          <Route path="/case/:caseId/applications" element={<CaseApplications />} />
+          <Route path="/case/:caseId/applications/new" element={<NewApplication />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
