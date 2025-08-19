@@ -3,7 +3,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
+import ClientNew from "./pages/ClientNew";
+import CaseSummaryQuestions from "./pages/CaseSummaryQuestions";
+import CaseLawAdvice from "./pages/CaseLawAdvice";
+import CaseFinalOverview from "./pages/CaseFinalOverview";
+import AjhaharDocument from "./pages/AjhaharDocument";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -15,7 +20,13 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/clients/new" element={<ClientNew />} />
+          <Route path="/case/summary-questions/:id" element={<CaseSummaryQuestions />} />
+          <Route path="/case/law-advice/:id" element={<CaseLawAdvice />} />
+          <Route path="/case/final-overview/:id" element={<CaseFinalOverview />} />
+          <Route path="/documents/ajhahar/:docId" element={<AjhaharDocument />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
