@@ -71,6 +71,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			fontFamily: {
+				'noto-serif-bengali': ['Noto Serif Bengali', 'serif'],
+				'sans': ['Noto Serif Bengali', 'system-ui', 'sans-serif'],
+				'serif': ['Noto Serif Bengali', 'serif'],
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
