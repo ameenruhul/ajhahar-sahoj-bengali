@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-import { FinalOverview } from "@/components/overview/FinalOverview";
+import { ComprehensiveFinalOverview } from "@/components/overview/ComprehensiveFinalOverview";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, FileText, Check } from "lucide-react";
@@ -50,7 +50,7 @@ const CaseFinalOverview = () => {
         <DashboardSidebar isOpen={isSidebarOpen} />
         
         <main className="flex-1 min-h-[calc(100vh-64px)] overflow-auto">
-          <div className="max-w-4xl mx-auto p-6 space-y-6">
+          <div className="max-w-6xl mx-auto p-6 space-y-6">
             {/* Progress Indicator */}
             <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
               <span className="bg-muted text-muted-foreground px-2 py-1 rounded">১</span>
@@ -66,7 +66,6 @@ const CaseFinalOverview = () => {
               <span>চূড়ান্ত প্রতিবেদন</span>
             </div>
 
-            {/* Modified FinalOverview with custom generate button */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
@@ -81,17 +80,10 @@ const CaseFinalOverview = () => {
                     <Check className="h-3 w-3 mr-1" />
                     ১০০% সম্পূর্ণ
                   </Badge>
-                  <Button 
-                    onClick={handleGenerateAjhahar}
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    আজহার PDF তৈরি করুন
-                  </Button>
                 </div>
               </div>
 
-              <FinalOverview />
+              <ComprehensiveFinalOverview caseId={id || ""} />
             </div>
             
             {/* Navigation */}
