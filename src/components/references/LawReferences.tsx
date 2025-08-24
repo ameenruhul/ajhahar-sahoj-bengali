@@ -30,9 +30,9 @@ const lawReferences: LawReference[] = [
     id: "1",
     title: "Penal Code 1860",
     bengaliTitle: "দণ্ডবিধি ১৮৬০",
-    section: "Section 379 - Theft",
+    section: "Section 378 - Theft",
     category: "criminal",
-    description: "চুরির ক্ষেত্রে প্রযোজ্য আইন। যে কেউ অন্যের অস্থাবর সম্পত্তি অসৎ উদ্দেশ্যে নিয়ে নিলে তা চুরি হিসেবে গণ্য।",
+    description: "চুরির ক্ষেত্রে প্রযোজ্য আইন। যে কেউ অন্যের অস্থাবর সম্পত্তি অসৎ উদ্দেশ্যে নিয়ে নিলে তা চুরি হিসেবে গণ্য। শাস্তি: ৩ বছর পর্যন্ত কারাদণ্ড বা জরিমানা অথবা উভয়।",
     relevance: "high"
   },
   {
@@ -41,17 +41,17 @@ const lawReferences: LawReference[] = [
     bengaliTitle: "ফৌজদারি কার্যবিধি ১৮৯৮",
     section: "Section 154 - FIR",
     category: "procedure",
-    description: "প্রাথমিক তথ্য প্রতিবেদন (FIR/আজহার) দায়ের করার নিয়মকানুন।",
+    description: "প্রাথমিক তথ্য প্রতিবেদন (FIR/আজহার) দায়ের করার নিয়মকানুন। ২৪ ঘন্টার মধ্যে থানায় লিখিত অভিযোগ দাখিল করতে হবে।",
     relevance: "high"
   },
   {
     id: "3",
     title: "Evidence Act 1872",
     bengaliTitle: "সাক্ষ্য আইন ১৮৭২",
-    section: "Section 3 - Evidence",
+    section: "Section 60 - Oral Evidence",
     category: "evidence",
-    description: "আদালতে সাক্ষ্য প্রমাণ উপস্থাপনের নিয়মাবলী।",
-    relevance: "medium"
+    description: "আদালতে মৌখিক সাক্ষ্য প্রমাণ উপস্থাপনের নিয়মাবলী। সাক্ষীদের বিবৃতি ও ডিজিটাল প্রমাণ সংক্রান্ত।",
+    relevance: "high"
   },
   {
     id: "4",
@@ -59,7 +59,25 @@ const lawReferences: LawReference[] = [
     bengaliTitle: "চুক্তি আইন ১৮৭২",
     section: "Section 73 - Compensation",
     category: "civil",
-    description: "চুক্তি ভঙ্গের ক্ষেত্রে ক্ষতিপূরণের বিধান।",
+    description: "চুক্তি ভঙ্গের ক্ষেত্রে ক্ষতিপূরণের বিধান। ক্রেতা-বিক্রেতার মধ্যে লেনদেন সংক্রান্ত।",
+    relevance: "medium"
+  },
+  {
+    id: "5",
+    title: "Information and Communication Technology Act 2006",
+    bengaliTitle: "তথ্য ও যোগাযোগ প্রযুক্তি আইন ২০০৬",
+    section: "Section 65B - Electronic Evidence",
+    category: "evidence", 
+    description: "ডিজিটাল/ইলেকট্রনিক প্রমাণ (সিসিটিভি ফুটেজ) আদালতে গ্রহণযোগ্যতার শর্তাবলী।",
+    relevance: "high"
+  },
+  {
+    id: "6",
+    title: "Police Act 1861",
+    bengaliTitle: "পুলিশ আইন ১৮৬১",
+    section: "Section 25 - Police Duties",
+    category: "procedure",
+    description: "পুলিশের দায়িত্ব ও কর্তব্য। অপরাধ তদন্ত ও গ্রেফতার সংক্রান্ত ক্ষমতা।",
     relevance: "medium"
   }
 ];
@@ -74,8 +92,8 @@ const categories = [
 
 export function LawReferences() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedReferences, setSelectedReferences] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("criminal");
+  const [selectedReferences, setSelectedReferences] = useState<string[]>(["1", "2", "3", "5"]);
 
   const filteredReferences = lawReferences.filter(ref => {
     const matchesSearch = ref.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

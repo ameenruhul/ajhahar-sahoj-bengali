@@ -60,13 +60,24 @@ const questions: Question[] = [
     bengaliQuestion: "আপনার কাছে কোন সহায়ক নথিপত্র আছে কি?",
     category: "documents",
     isRequired: false
+  },
+  {
+    id: "q6",
+    question: "Were there any witnesses to the incident?",
+    bengaliQuestion: "ঘটনার কোন সাক্ষী ছিল কি?",
+    category: "witnesses",
+    isRequired: false
   }
 ];
 
 export function GuidedQASession() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Answer[]>([]);
-  const [currentAnswer, setCurrentAnswer] = useState("");
+  const [answers, setAnswers] = useState<Answer[]>([
+    { questionId: "q1", answer: "এটি একটি ফৌজদারি মামলা - চুরির অভিযোগ। দণ্ডবিধি ১৮৬০ এর ৩৭৮ ধারা অনুযায়ী চুরির অপরাধ।" },
+    { questionId: "q2", answer: "না, এর আগে কোন মামলা বা বিরোধ নেই। এটি প্রথমবার এমন ঘটনা ঘটেছে।" },
+    { questionId: "q3", answer: "অভিযুক্তদের গ্রেফতার ও যথাযথ শাস্তি চাই। ক্ষতিপূরণ এবং ভবিষ্যতে নিরাপত্তার নিশ্চয়তা চাই।" }
+  ]);
+  const [currentAnswer, setCurrentAnswer] = useState("৫০,০০০ টাকার স্মার্টফোন নিয়ে যাওয়ার চেষ্টা হয়েছে। এছাড়া মানসিক কষ্ট ও ব্যবসায়িক ক্ষতি হয়েছে।");
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 

@@ -46,13 +46,13 @@ const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image
 
 export function EnhancedClientForm({ onFormChange, onAutoSave }: EnhancedClientFormProps) {
   const [formData, setFormData] = useState<ClientFormData>({
-    name: "",
-    address: "",
-    phone: "",
-    caseNumber: "",
-    nid: "",
-    caseDescription: "",
-    hasAjhahar: false,
+    name: "মোহাম্মদ আব্দুল রহিম উদ্দিন",
+    address: "বাড়ি নং ২৫, রোড নং ৩, ব্লক: এ, সেকশন: ২, মিরপুর-১০, ঢাকা-১২১৬, বাংলাদেশ",
+    phone: "+৮৮০১৭১২-৩৪৫৬৭৮",
+    caseNumber: "CASE-2024-001",
+    nid: "১৯৭৮১২৩৪৫৬৭৮৯০১২",
+    caseDescription: "মতিঝিল বাণিজ্যিক এলাকায় অবস্থিত আমার মোবাইল ফোনের দোকান থেকে ৫০,০০০ টাকা মূল্যের একটি স্যামসাং গ্যালাক্সি এস২৪ স্মার্টফোন জোরপূর্বক নিয়ে যাওয়ার চেষ্টা করা হয়। ঘটনাটি ১৫ জানুয়ারি ২০২৪ তারিখে দুপুর ২টা ৩০ মিনিটে ঘটে। অভিযুক্ত ব্যক্তি নিজেকে 'রফিক উদ্দিন' বলে পরিচয় দিয়ে প্রথমে ফোনটি দেখার জন্য নেন, কিন্তু টাকা না দিয়েই নিয়ে যেতে চেষ্টা করেন। আমি এবং পাশের দোকানদার মিলে তাকে আটকাই। পুরো ঘটনা দোকানের সিসিটিভি ক্যামেরায় রেকর্ড হয়েছে। ঘটনাস্থলে দুইজন সাক্ষী উপস্থিত ছিলেন।",
+    hasAjhahar: true,
     attachments: []
   });
 
