@@ -10,7 +10,7 @@ interface CaseSummaryFormProps {
 }
 
 export const CaseSummaryForm = ({ caseId }: CaseSummaryFormProps) => {
-  const [summary, setSummary] = useState("");
+  const [summary, setSummary] = useState("মতিঝিল বাণিজ্যিক এলাকায় অবস্থিত আমার মোবাইল ফোনের দোকান থেকে এক অপরিচিত ব্যক্তি ৫০,০০০ টাকার স্মার্টফোন জোরপূর্বক নিয়ে যাওয়ার চেষ্টা করেন। ঘটনার সময় দুইজন সাক্ষী উপস্থিত ছিলেন এবং পুরো ঘটনা সিসিটিভি ক্যামেরায় রেকর্ড হয়েছে।");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const { toast } = useToast();
 

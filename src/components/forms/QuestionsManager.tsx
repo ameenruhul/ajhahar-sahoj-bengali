@@ -21,9 +21,30 @@ interface QuestionsManagerProps {
 
 export const QuestionsManager = ({ caseId }: QuestionsManagerProps) => {
   const [questions, setQuestions] = useState<Question[]>([
-    { id: "1", text: "", isAnswerOpen: false },
-    { id: "2", text: "", isAnswerOpen: false },
-    { id: "3", text: "", isAnswerOpen: false },
+    { 
+      id: "1", 
+      text: "অভিযুক্ত ব্যক্তির সম্পূর্ণ পরিচয় জানা আছে কি?", 
+      answer: "অভিযুক্ত ব্যক্তি নিজেকে 'রফিক উদ্দিন' বলে পরিচয় দিয়েছিলেন, তবে কোনো সঠিক ঠিকানা বা পরিচয়পত্র দেখাননি। তার বয়স আনুমানিক ৩০-৩৫ বছর, গায়ের রং শ্যামলা, মাঝারি উচ্চতা।",
+      isAnswerOpen: true 
+    },
+    { 
+      id: "2", 
+      text: "ঘটনার সময় আর কেউ উপস্থিত ছিলেন কি?", 
+      answer: "হ্যাঁ, পাশের দোকানদার মোহাম্মদ করিম সাহেব পুরো ঘটনা দেখেছেন। এছাড়াও একজন মহিলা ক্রেতা সালমা খাতুন উপস্থিত ছিলেন যিনি ঘটনার সাক্ষী দিতে রাজি আছেন।",
+      isAnswerOpen: false 
+    },
+    { 
+      id: "3", 
+      text: "কোন ধরনের প্রমাণ সংগ্রহ করা হয়েছে?", 
+      answer: "আমাদের কাছে দোকানের সিসিটিভি ক্যামেরার সম্পূর্ণ ফুটেজ আছে যেখানে পুরো ঘটনা স্পষ্টভাবে দেখা যাচ্ছে। মোবাইল ফোনের ক্রয়ের রসিদ, দোকানের লাইসেন্স এবং সাক্ষীদের লিখিত বিবৃতি রয়েছে।",
+      isAnswerOpen: false 
+    },
+    {
+      id: "4",
+      text: "আগে কি এই ধরনের ঘটনা ঘটেছে?",
+      answer: "এই প্রথমবার আমার দোকানে এমন ঘটনা ঘটেছে। তবে এলাকায় মাঝে মাঝে এ ধরনের চুরির ঘটনা ঘটে থাকে।",
+      isAnswerOpen: false
+    }
   ]);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const { toast } = useToast();

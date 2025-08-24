@@ -21,15 +21,15 @@ interface ClientInfo {
 
 export function ClientInfoForm() {
   const [clientInfo, setClientInfo] = useState<ClientInfo>({
-    name: "",
-    nameEnglish: "",
-    fatherName: "",
-    motherName: "",
-    age: "",
-    phone: "",
-    address: "",
-    occupation: "",
-    nationalId: ""
+    name: "মোহাম্মদ আব্দুল রহিম",
+    nameEnglish: "Mohammad Abdul Rahim",
+    fatherName: "মোহাম্মদ আব্দুর রহমান",
+    motherName: "ফাতেমা খাতুন",
+    age: "৪৫",
+    phone: "০১৭১২-৩৪৫৬৭৮",
+    address: "বাড়ি: ২৫, রোড: ৩, ব্লক: এ, মিরপুর-১০, ঢাকা-১২১৬",
+    occupation: "ব্যবসায়ী (মোবাইল ফোনের দোকান)",
+    nationalId: "১৯৭৮১২৩৪৫৬৭৮৯০১"
   });
 
   const [isSaved, setIsSaved] = useState(false);
